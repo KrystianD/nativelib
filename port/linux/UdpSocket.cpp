@@ -8,7 +8,9 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <unistd.h>
+#include <sys/ioctl.h>
 
+namespace nativelib {
 UdpSocket::UdpSocket() : fd(-1)
 {
 }
@@ -28,11 +30,13 @@ bool UdpSocket::init()
 
 	return true;
 }
+
 bool UdpSocket::bind(int port)
 {
 	m_port = port;
 	return bind();
 }
+
 bool UdpSocket::bind()
 {
 	struct sockaddr_in myaddr;
@@ -47,25 +51,55 @@ bool UdpSocket::bind()
 
 	return true;
 }
+
 void UdpSocket::close()
 {
 	::close(fd);
+	fd = -1;
 }
 
-bool UdpSocket::send(const char* ip, uint16_t port, const void* data, int len)
+bool UdpSocket::send(const IPv4& ip, uint16_t port, const void* data, int len)
 {
 	struct sockaddr_in remaddr;
 	remaddr.sin_family = AF_INET;
 	remaddr.sin_port = htons(port);
-	inet_pton(AF_INET, ip, &(remaddr.sin_addr));
+	remaddr.sin_addr.s_addr = ip.val();
 
-	if (sendto(fd, (const char*)data, len, 0, (struct sockaddr*)&remaddr, sizeof(remaddr)) < 0) {
-		return false;
-	} else {
-		return true;
-	}
+	return sendto(fd, (const char*)data, len, 0, (struct sockaddr*)&remaddr, sizeof(remaddr)) < 0;
 }
-int UdpSocket::recv(const char ip[20], uint16_t& port, void* data, int len, uint32_t timeout)
+
+int UdpSocket::recv(IPv4& ip, uint16_t& port, void* data, int len, uint32_t timeout)
+{
+	int r = waitForData(timeout);
+
+	if (r == 1) {
+		struct sockaddr_in remaddr;
+		socklen_t addrlen = sizeof(remaddr);
+		int recvlen = recvfrom(fd, data, len, 0, (struct sockaddr*)&remaddr, &addrlen);
+
+		ip.setVal(remaddr.sin_addr.s_addr);
+		port = ntohs(remaddr.sin_port);
+
+		return recvlen;
+	}
+
+	return r;
+}
+
+int UdpSocket::recv(void* data, int len, uint32_t timeout)
+{
+	int r = waitForData(timeout);
+
+	if (r == 1) {
+		struct sockaddr_in remaddr;
+		socklen_t addrlen = sizeof(remaddr);
+		return recvfrom(fd, data, len, 0, (struct sockaddr*)&remaddr, &addrlen);
+	}
+
+	return r;
+}
+
+int UdpSocket::waitForData(uint32_t timeout)
 {
 	fd_set fds;
 
@@ -82,7 +116,6 @@ int UdpSocket::recv(const char ip[20], uint16_t& port, void* data, int len, uint
 	FD_ZERO(&fds);
 	FD_SET(fd, &fds);
 
-	// checking for new packet
 	int res = select(fd + 1, &fds, 0, 0, timeout_ptr);
 	if (res == -1) {
 		if (errno != EINTR) {
@@ -90,16 +123,16 @@ int UdpSocket::recv(const char ip[20], uint16_t& port, void* data, int len, uint
 		}
 	} else {
 		if (FD_ISSET(fd, &fds)) {
-			struct sockaddr_in remaddr;
-			socklen_t addrlen = sizeof(remaddr);
-			int recvlen = recvfrom(fd, data, len, 0, (struct sockaddr*)&remaddr, &addrlen);
-
-			inet_ntop(AF_INET, &(remaddr.sin_addr), (char*)ip, 20);
-			port = ntohs(remaddr.sin_port);
-
-			return recvlen;
+			return 1;
 		}
 	}
-
 	return 0;
+}
+
+int UdpSocket::available()
+{
+	int avail;
+	ioctl(fd, FIONREAD, &avail);
+	return avail;
+}
 }

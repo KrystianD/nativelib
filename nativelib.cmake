@@ -4,5 +4,6 @@ include_directories("${NATIVELIB_CUR_DIR}")
 include_directories("${NATIVELIB_CUR_DIR}/port/${NATIVELIB_PORT}")
 
 set(COMMON_SOURCES ${COMMON_SOURCES}
+  "${NATIVELIB_CUR_DIR}/port/${NATIVELIB_PORT}/Inet.cpp"
 	"${NATIVELIB_CUR_DIR}/port/${NATIVELIB_PORT}/UdpSocket.cpp"
 )
