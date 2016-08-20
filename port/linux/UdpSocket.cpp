@@ -8,5 +8,6 @@
 #define IMPL_RECVFROM ::recvfrom
 #define IMPL_SELECT   ::select
 #define IMPL_IOCTL    ::ioctl
+#define IMPL_CLOSE    ::close
 
 #include "../../tpl/UdpSocket.cpp"

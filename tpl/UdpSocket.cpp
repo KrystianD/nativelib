@@ -16,8 +16,7 @@ UdpSocket::UdpSocket(int port) : fd(-1), m_port(port)
 }
 UdpSocket::~UdpSocket()
 {
-	if (fd != -1)
-		close();
+	close();
 }
 
 bool UdpSocket::init()
@@ -51,11 +50,12 @@ bool UdpSocket::bind()
 
 void UdpSocket::close()
 {
-	::close(fd);
+	if (fd != -1)
+		IMPL_CLOSE(fd);
 	fd = -1;
 }
 
-bool UdpSocket::send(const IPv4& ip, uint16_t port, const void* data, int len)
+bool UdpSocket::send(const IPv4& ip, uint16_t port, const void* data, uint32_t len)
 {
 	struct sockaddr_in remaddr;
 	remaddr.sin_family = AF_INET;
@@ -65,7 +65,7 @@ bool UdpSocket::send(const IPv4& ip, uint16_t port, const void* data, int len)
 	return IMPL_SENDTO(fd, (const char*)data, len, 0, (struct sockaddr*)&remaddr, sizeof(remaddr)) < 0;
 }
 
-int UdpSocket::recv(IPv4& ip, uint16_t& port, void* data, int len, uint32_t timeout)
+int UdpSocket::recv(IPv4& ip, uint16_t& port, void* data, uint32_t len, uint32_t timeout)
 {
 	int r = waitForData(timeout);
 
@@ -83,7 +83,7 @@ int UdpSocket::recv(IPv4& ip, uint16_t& port, void* data, int len, uint32_t time
 	return r;
 }
 
-int UdpSocket::recv(void* data, int len, uint32_t timeout)
+int UdpSocket::recv(void* data, uint32_t len, uint32_t timeout)
 {
 	int r = waitForData(timeout);
 

@@ -8,5 +8,10 @@
 #define IMPL_RECVFROM ::lwip_recvfrom
 #define IMPL_SELECT   ::lwip_select
 #define IMPL_IOCTL    ::lwip_ioctl
+#define IMPL_CLOSE    ::lwip_close
+
+#if LWIP_SO_RCVBUF != 1
+#error LWIP_SO_RCVF must be equal to 1
+#endif
 
 #include "../../tpl/UdpSocket.cpp"

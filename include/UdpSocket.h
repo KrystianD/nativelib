@@ -19,17 +19,15 @@ public:
 
 	void setPort(int port) { m_port = port; }
 
-	bool send(const char* ip, uint16_t port, const void* data, int len) { return send(IPv4::parse(ip), port, data, len); }
-	bool send(const IPv4& ip, uint16_t port, const void* data, int len);
-	int recv(char ip[20], uint16_t& port, void* data, int len, uint32_t timeout = 0xffffffff)
+	bool send(const IPv4& ip, uint16_t port, const void* data, uint32_t len);
+	bool send(const char* ip, uint16_t port, const void* data, uint32_t len) { return send(IPv4::parse(ip), port, data, len); }
+	bool send(const InetAddress& addr, const void* data, uint32_t len) { return send(addr.ip(), addr.port(), data, len); }
+	int recv(IPv4& ip, uint16_t& port, void* data, uint32_t len, uint32_t timeout = 0xffffffff);
+	int recv(InetAddress& addr, void* data, uint32_t len, uint32_t timeout = 0xffffffff)
 	{
-    IPv4 ipv4;
-    int r = recv(ipv4, port, data, len, timeout);
-    ipv4.toString(ip, 20);
-    return r;
+		return recv(addr.ip(), addr.port(), data, len, timeout);
 	}
-	int recv(IPv4& ip, uint16_t& port, void* data, int len, uint32_t timeout = 0xffffffff);
-	int recv(void* data, int len, uint32_t timeout = 0xffffffff);
+	int recv(void* data, uint32_t len, uint32_t timeout = 0xffffffff);
 
 	int waitForData(uint32_t timeout = 0xffffffff);
 
