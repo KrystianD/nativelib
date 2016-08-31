@@ -7,7 +7,6 @@
 #include <lwip/dns.h>
 
 namespace nativelib {
-
 void IPv4::toString(char* buf, int maxLen) const
 {
 	struct in_addr in;
@@ -35,17 +34,6 @@ int Inet::resolveDns(const char* addr, IPv4& ipv4)
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
 	addrinfo *res = 0;
-	// hostent *he = gethostbyname(addr);
-	// if (he == 0)
-	// return -1;
-
-	// struct in_addr** addr_list = (struct in_addr**)he->h_addr_list;
-
-	// for (int i = 0; addr_list[i] != 0; i++) {
-	// struct in_addr inaddr = *(addr_list[i]);
-	// ipv4.setVal(inaddr.s_addr);
-	// return 0;
-	// }
 
 	int err = lwip_getaddrinfo(addr, "80", &hints, &res);
 
@@ -59,5 +47,4 @@ int Inet::resolveDns(const char* addr, IPv4& ipv4)
 	ipv4.setVal(addr_in->sin_addr.s_addr);
 	return 0;
 }
-
 }

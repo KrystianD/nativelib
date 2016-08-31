@@ -26,7 +26,7 @@ IPv4 IPv4::parse(const char* str)
 
 int Inet::resolveDns(const char* addr, IPv4& ipv4)
 {
-	hostent *he = gethostbyname(addr);
+	hostent* he = gethostbyname(addr);
 	if (he == 0)
 		return -1;
 
@@ -37,6 +37,8 @@ int Inet::resolveDns(const char* addr, IPv4& ipv4)
 		ipv4.setVal(inaddr.s_addr);
 		return 0;
 	}
+
+	return -1;
 }
 
 }

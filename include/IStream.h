@@ -18,13 +18,13 @@ public:
 	{
 		uint8_t* _data = (uint8_t*)data + offset;
 		int pos = 0;
-		uint64_t startTime = crosslib::OS::getTime();
+		uint64_t startTime = crosslib::OS::getTimeMS();
 		while (length) {
 			uint32_t toWait;
 			if (timeout == 0xffffffff) {
 				toWait = 0xffffffff;
 			} else {
-				uint32_t elapsed = crosslib::OS::getTime() - startTime;
+				uint32_t elapsed = crosslib::OS::getTimeMS() - startTime;
 				if (elapsed >= timeout)
 					break;
 				toWait = timeout - elapsed;
@@ -44,13 +44,13 @@ public:
 	{
 		uint8_t* _data = (uint8_t*)data + offset;
 		int pos = 0;
-		uint64_t startTime = crosslib::OS::getTime();
+		uint64_t startTime = crosslib::OS::getTimeMS();
 		while (length) {
 			uint32_t toWait;
 			if (timeout == 0xffffffff) {
 				toWait = 0xffffffff;
 			} else {
-				uint32_t elapsed = crosslib::OS::getTime() - startTime;
+				uint32_t elapsed = crosslib::OS::getTimeMS() - startTime;
 				if (elapsed >= timeout)
 					break;
 				toWait = timeout - elapsed;
