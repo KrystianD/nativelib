@@ -6,10 +6,11 @@
 
 #include <crosslib.h>
 
-class IStream {
+class IStream
+{
 public:
-	IStream() { }
-	virtual ~IStream() { }
+	IStream() {}
+	virtual ~IStream() {}
 
 	virtual int read(void* data, uint32_t offset, uint32_t length, uint32_t timeout = 0xffffffff) = 0;
 	virtual int write(const void* data, uint32_t offset, uint32_t length, uint32_t timeout = 0xffffffff) = 0;
@@ -40,7 +41,7 @@ public:
 		return pos;
 	}
 
-	virtual int writeAll(void* data, uint32_t offset, uint32_t length, uint32_t timeout = 0xffffffff)
+	virtual int writeAll(const void* data, uint32_t offset, uint32_t length, uint32_t timeout = 0xffffffff)
 	{
 		uint8_t* _data = (uint8_t*)data + offset;
 		int pos = 0;
@@ -67,9 +68,14 @@ public:
 	}
 };
 
-class NullStream : public IStream {
+class NullStream : public IStream
+{
 public:
-	int read(void* data, uint32_t offset, uint32_t length, uint32_t timeout = 0xffffffff) override { crosslib::OS::sleep(timeout); return 0; }
+	int read(void* data, uint32_t offset, uint32_t length, uint32_t timeout = 0xffffffff) override
+	{
+		crosslib::OS::sleep(timeout);
+		return 0;
+	}
 	int write(const void* data, uint32_t offset, uint32_t length, uint32_t timeout = 0xffffffff) override { return length; }
 	int readAll(void* data, uint32_t offset, uint32_t length, uint32_t timeout) override { return read(data, offset, length, timeout); }
 };
