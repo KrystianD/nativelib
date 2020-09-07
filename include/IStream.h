@@ -32,7 +32,7 @@ public:
 			}
 
 			int ret = read(_data, 0, length, toWait);
-			if (ret < 0)
+			if (ret <= 0)
 				return ret;
 			_data += ret;
 			pos += ret;
@@ -58,7 +58,7 @@ public:
 			}
 
 			int ret = write(_data, 0, length, toWait);
-			if (ret < 0)
+			if (ret <= 0)
 				return ret;
 			_data += ret;
 			pos += ret;
