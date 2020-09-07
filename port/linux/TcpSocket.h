@@ -18,7 +18,7 @@ namespace nativelib
 		};
 
 		TcpSocket();
-		~TcpSocket();
+		~TcpSocket() override;
 
 		int getFd() const { return sockFd; }
 
